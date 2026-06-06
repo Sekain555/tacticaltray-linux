@@ -31,15 +31,29 @@ impl NoxTray {
     }
 
     fn load_frames(dark: bool) -> Vec<Vec<u8>> {
-        (0..8).map(|i| {
-            let path = if dark {
-                format!("assets/nox_dark_{}.png", i)
-            } else {
-                format!("assets/nox_{}.png", i)
-            };
-            std::fs::read(&path)
-                .unwrap_or_else(|_| std::fs::read("assets/icon.png").unwrap())
-        }).collect()
+        if dark {
+            vec![
+                include_bytes!("../assets/nox_dark_0.png").to_vec(),
+                include_bytes!("../assets/nox_dark_1.png").to_vec(),
+                include_bytes!("../assets/nox_dark_2.png").to_vec(),
+                include_bytes!("../assets/nox_dark_3.png").to_vec(),
+                include_bytes!("../assets/nox_dark_4.png").to_vec(),
+                include_bytes!("../assets/nox_dark_5.png").to_vec(),
+                include_bytes!("../assets/nox_dark_6.png").to_vec(),
+                include_bytes!("../assets/nox_dark_7.png").to_vec(),
+            ]
+        } else {
+            vec![
+                include_bytes!("../assets/nox_0.png").to_vec(),
+                include_bytes!("../assets/nox_1.png").to_vec(),
+                include_bytes!("../assets/nox_2.png").to_vec(),
+                include_bytes!("../assets/nox_3.png").to_vec(),
+                include_bytes!("../assets/nox_4.png").to_vec(),
+                include_bytes!("../assets/nox_5.png").to_vec(),
+                include_bytes!("../assets/nox_6.png").to_vec(),
+                include_bytes!("../assets/nox_7.png").to_vec(),
+            ]
+        }
     }
 
     fn detect_dark_mode() -> bool {
