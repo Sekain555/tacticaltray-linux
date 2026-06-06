@@ -60,6 +60,25 @@ tacticaltray-linux/
 - Los frames se cargan una sola vez al inicio con `include_bytes!` — no releer archivos en tiempo de ejecución
 - `System` de sysinfo **no implementa `Clone`** — no intentar clonarlo
 
+### Mejoras pendientes conocidas (feedback de la comunidad)
+
+Las siguientes mejoras fueron identificadas por la comunidad de r/kde. Implementarlas requiere aprobación del desarrollador:
+
+1. **GPU hardcodeada en `card0`** — escanear `/sys/class/drm/` dinámicamente en lugar de asumir `card0`. Afecta hardware con múltiples GPUs o tarjetas en slots distintos.
+
+2. **Detección de tema via D-Bus** — reemplazar la lectura de `kdeglobals` por una consulta a `org.freedesktop.portal.Settings` (`org.freedesktop.appearance`, clave `color-scheme`). La implementación actual solo funciona con el tema Breeze.
+
+3. **Optimizaciones de build** — agregar en `Cargo.toml`:
+   ```toml
+   [profile.release]
+   opt-level = "z"
+   lto = true
+   codegen-units = 1
+   strip = true
+   panic = "abort"
+   ```
+   Esto reduce el tamaño del binario aproximadamente a la mitad.
+
 ### AUR
 
 - El repositorio AUR es **separado** del repositorio de código: `ssh://aur@aur.archlinux.org/tacticaltray-linux.git`
@@ -120,11 +139,13 @@ paru -S tacticaltray-linux
 
 ## Backlog actual (en orden de prioridad)
 
-1. **Binario precompilado en GitHub Releases** — evitar que los usuarios compilen 233MB de dependencias
-2. **Sistema de progresión de kilómetros** — contador acumulativo que desbloquea animaciones
-3. **Soporte Crouch Walk y Climb Back** — activar una vez implementado el sistema de progresión
-4. **Integración Nightfall Tactics** — desbloqueo de Walk y Shoot 2H al instalar/completar el juego
-5. **Widget de escritorio** — ventana flotante con Nox y métricas (Fase 2)
+1. **Detección de tema via D-Bus** — soportar cualquier tema KDE, no solo Breeze
+2. **Escaneo dinámico de GPU** — no asumir `card0`
+3. **Optimizaciones de build** — reducir tamaño del binario con `opt-level = "z"` + `lto` + `strip`
+4. **Sistema de progresión de kilómetros** — contador acumulativo que desbloquea animaciones
+5. **Soporte Crouch Walk y Climb Back** — activar una vez implementado el sistema de progresión
+6. **Integración Nightfall Tactics** — desbloqueo de Walk y Shoot 2H al instalar/completar el juego
+7. **Widget de escritorio** — ventana flotante con Nox y métricas (Fase 2)
 
 ---
 

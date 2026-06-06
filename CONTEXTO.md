@@ -105,6 +105,8 @@ Los frames de Nox viven en `assets/` durante el desarrollo y se embeben en el bi
 
 Lee `~/.config/kdeglobals` y detecta si contiene `BreezeDark` o `Breeze Dark`. Si no puede leer el archivo, asume tema claro.
 
+**Limitación conocida:** Solo funciona con el tema Breeze. La forma correcta es consultar `org.freedesktop.portal.Settings` via D-Bus para obtener el esquema de color del sistema independientemente del tema — pendiente implementar en v1.1.0.
+
 ---
 
 ## Distribución
@@ -112,7 +114,7 @@ Lee `~/.config/kdeglobals` y detecta si contiene `BreezeDark` o `Breeze Dark`. S
 | Canal | Estado | Comando |
 |---|---|---|
 | AUR | ✅ Publicado | `paru -S tacticaltray-linux` |
-| GitHub Releases | ⏳ Pendiente binario precompilado | — |
+| GitHub Releases | ✅ Binario publicado | Descarga directa |
 
 El PKGBUILD descarga el tarball del tag de GitHub, compila desde fuente con `cargo build --release --locked` e instala el binario en `/usr/bin/tacticaltray-linux`.
 
@@ -143,11 +145,14 @@ X-GNOME-Autostart-enabled=true
 - Frames embebidos en el binario (`include_bytes!`)
 - Publicación en el AUR
 - Autostart configurado en KDE
+- Binario precompilado en GitHub Releases
 
 ### BACKLOG
+- Detección de tema via D-Bus (`org.freedesktop.portal.Settings`) — soportar cualquier tema KDE
+- Escaneo dinámico de GPU — no asumir `card0`, buscar la tarjeta activa automáticamente
+- Optimizaciones de build en `Cargo.toml` (`opt-level = "z"`, `lto`, `strip`) — reducir tamaño del binario
 - Sistema de progresión de kilómetros y desbloqueo de animaciones
-- Release de binario precompilado en GitHub (evitar compilación de 233MB)
-- Soporte para animaciones adicionales (Walk, Crouch Walk, Climb Back)
+- Soporte para animaciones adicionales (Crouch Walk, Climb Back)
 - Integración con Nightfall Tactics para desbloqueo de Walk y Shoot 2H
 - Widget de escritorio (Fase 2)
 
@@ -155,10 +160,11 @@ X-GNOME-Autostart-enabled=true
 
 ## Pendientes técnicos conocidos
 
-- El binario se compiló sin `--locked` verificado en el PKGBUILD — confirmar que `Cargo.lock` está en el repo
-- GPU readings dependen de `/sys/class/drm/card0/` — puede no funcionar en todas las configuraciones de hardware
-- La detección de tema solo lee `kdeglobals` — no reacciona a cambios de tema en caliente
-- El PKGBUILD descarga y compila ~233MB de dependencias Rust — mejorar con binario precompilado en v1.0.1
+- **GPU hardcodeada en `card0`** — en hardware con múltiples GPUs o tarjetas en slots distintos puede no funcionar. Solución: escanear `/sys/class/drm/` dinámicamente buscando el archivo `gpu_busy_percent`.
+- **Detección de tema solo con Breeze** — si el usuario usa otro tema KDE, siempre arranca en modo claro. Solución: consultar `org.freedesktop.portal.Settings` via D-Bus.
+- **Binario sin optimizaciones de tamaño** — el binario actual pesa ~7.7MB. Con `opt-level = "z"` + `lto = true` + `strip = true` podría reducirse a la mitad.
+- **No reacciona a cambios de tema en caliente** — hay que cerrar y reabrir la app para cambiar entre modo claro y oscuro.
+- **Compilación desde fuente ~233MB** — el PKGBUILD descarga y compila todas las dependencias Rust. El binario precompilado en GitHub Releases es la alternativa para otras distros.
 
 ---
 
